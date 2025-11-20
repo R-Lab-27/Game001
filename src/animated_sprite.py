@@ -15,31 +15,46 @@ class AnimatedSprite:
         self.frame_index = 0
         self.frame_timer = 0
 
-        # Por defecto, arrancar con la primera animación del dict (opcional)
-        # self.play(next(iter(animation_ranges)))
+        self.locked = False
+        self.on_end_callback = None
 
-    def play(self, animation_name):
-        """Cambiar de animación."""
+    def play(self, animation_name, lock=False, on_end=None):
+        """Cambiar de animación.
+           Si hay animación en curso y la nueva animación es diferente, No la cambiamos """
+        if self.locked and animation_name != self.current_animation:
+            return
+        
         if animation_name not in self.animation_ranges:
             raise ValueError(f"Animación desconocida: {animation_name}")
+        
         if animation_name != self.current_animation:
             self.current_animation = animation_name
             start, end = self.animation_ranges[animation_name]
             self.frame_index = start
             self.frame_timer = 0
+            self.locked = lock
+            self.on_end_callback = on_end
 
     def update(self):
-        """Actualizar el frame de animación según el frame_duration."""
+        """Actualizar el frame de animación según el frame_duration y detectar cuando termina la animación bloqueada"""
         if self.current_animation is None:
             return
 
         self.frame_timer += 1
+
         if self.frame_timer >= self.frame_duration:
             self.frame_timer = 0
             start, end = self.animation_ranges[self.current_animation]
             # Avanzar el índice dentro del rango
             self.frame_index += 1
+
             if self.frame_index >= end:
+                #Terminó la animación
+                if self.locked:
+                    self.locked = False
+                    if self.on_end_callback:
+                        self.on_end_callback()
+                #Volver al inicio de la animación
                 self.frame_index = start
 
     def get_current_frame(self):

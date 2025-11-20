@@ -9,12 +9,23 @@ class Player:
         self.sprite_sheet = SpriteSheet("/home/r/Training/Proyectos/Game001/src/assets/adventurer-1.3-Sheet.png", 8, 12)
         # Usar AnimatedSprite
         # Definir los rangos para idle, walk y run
+        
         animation_ranges = {
             "idle": (0, 4),
             "agachar": (5, 8),
             "run": (9, 16),
-            "jump": (17, 25)
+            "jump": (17, 25),
+            "attack_1":(43, 48),
+            "attack_2": (49, 53),
+            "attack_3": (54, 59)
         }
+
+        # self.frame_duration = {
+        #     "idle": 
+        # }
+        # if self.state == "attack":
+        #     self.frame_duration = 10
+
         self.anim = AnimatedSprite(self.sprite_sheet, animation_ranges=animation_ranges, frame_duration=7)
 
         self.rect = pygame.Rect(x, y,
@@ -39,6 +50,13 @@ class Player:
 
         #nuestro vector de dirección
         self.facing_right = True # suposición inicial
+
+        #Esta atacando
+        self.attack = False
+
+        #Variables para el combo de ataque
+        self.combo_step = 0  # 0 = sin combo, 1 ,2,3 para ataques
+        self.combo_buffer = False
         
         # Estado de animación actual
         self.state = "idle"
@@ -91,9 +109,15 @@ class Player:
                 self.vel_y = self.jump_strength
                 self.is_in_air = True
 
+        #Atacar
+        if keys[pygame.K_r] and not self.is_in_air:
+            #Solo atacar si no estamos en el aire, en este caso activamos el buffer para rastrear el combo de ataque
+            if self.combo_step > 0: #Si ya esta en un ataque
+                self.combo_buffer = True #permitir combo
+            elif not self.is_in_air:
+                self.combo_buffer = True
+            
         # limitar la velocidad
-        # si querés que "run" sea cuando vas rápido
-        # podés hacer algo como:
         if abs(self.vel_x) > self.max_run_speed:
             self.vel_x = self.max_run_speed * (1 if self.vel_x > 0 else -1)
 
@@ -108,6 +132,17 @@ class Player:
         # Decidir animaciones según estado
         if self.is_in_air:
             new_state = "jump"
+
+        #Si presionas R y el combo aún no inicio, inicia el combo
+        elif self.combo_buffer and self.combo_step == 0:
+            self.combo_buffer = False
+            self.combo_step += 1
+            new_state = "attack_1"
+        #Si ya estas en medio de un combo, continuar con la animación actual
+        elif self.combo_step > 0:
+            new_state = f"attack_{self.combo_step}"
+            self.combo_step += 1
+        #Movimiento del personaje
         else:
             speed = abs(self.vel_x)
             if speed < 0.1:
@@ -117,9 +152,29 @@ class Player:
             else:
                 new_state = "run"
 
+        #Si el estado cambió, reproducir animación
         if new_state != self.state:
             self.state = new_state
-            self.anim.play(new_state)
+
+            if "attack" in new_state:
+            # if new_state.startswith("attack"):
+                self.anim.play(new_state, lock=True, on_end=lambda: self._finish_attack())
+            else:
+                self.anim.play(new_state)
+
+    def _finish_attack(self):
+        #Método para avanzar el combo de ataque
+        if self.combo_buffer:
+            self.combo_buffer = False
+            self.combo_step += 1
+            if self.combo_step >= 3:
+                self.combo_step = 0
+            return
+
+        # En este caso no hubo input entonces es el fin del combo
+        self.combo_step = 0
+        self.state = "idle"
+        self.anim.play("idle")
 
     def resolve_collisions(self):
         """ Resolver colisiones verticales y horizontales con plataformas"""
@@ -153,10 +208,10 @@ class Player:
         self.resolve_collisions()
         self.update_state()
 
-        # actualizás animación
+        # actualiza animación
         self.anim.update()
 
-        # actualizás posición según velocidad
+        # actualiza posición según velocidad
         self.rect.x += self.vel_x
 
     def draw(self, screen):
