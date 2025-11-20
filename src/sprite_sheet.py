@@ -1,14 +1,14 @@
 import pygame
 
 class SpriteSheet:
-    def __init__(self, filename, cols, rows):
+    def __init__(self, filename, anim_cols, anim_rows):
         self.sheet = pygame.image.load(filename).convert_alpha()
-        self.cols = cols
-        self.rows = rows
+        self.cols = anim_cols
+        self.rows = anim_rows
         self.sheet_width = self.sheet.get_width()
         self.sheet_height = self.sheet.get_height()
-        self.frame_width = self.sheet_width // cols
-        self.frame_height = self.sheet_height // rows
+        self.frame_width = self.sheet_width // anim_cols
+        self.frame_height = self.sheet_height // anim_rows
         self.frames = []
         self.load_frames()
 

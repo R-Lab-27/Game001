@@ -24,9 +24,9 @@ class Player:
         # Velocidad física
         self.vel_x = 0.0
         self.vel_y = 0.0
-        self.acceleration = 0.2   # cuánto acelera al apretar tecla
+        self.acceleration = 0.1   # cuánto acelera al apretar tecla
         self.max_walk_speed = 2.0
-        self.max_run_speed = 4.0
+        self.max_run_speed = 3.0
         self.friction = 0.3       # desacelera cuando no se presiona
 
         # Gravedad y salto
@@ -53,7 +53,13 @@ class Player:
                 # Si actualmente esta en el aire, que ya no aumente la aceleración en el eje x, si no que por fricción la reduzca
                 pass
             else:
-                self.vel_x += self.acceleration
+                #Cuando la velocidad en dirección derecha o izquierda es muy alta, al cambiar abruptamente de dirección se produce un desliz hacia la
+                #dirección contraría de donde se apreta el botón, para solucionarlo, en cuanto se aprete el botón si la velocidad es muy alta en -x o x se establece en cero
+                if self.vel_x < 0:
+                    self.vel_x = 0
+                    self.vel_x += self.acceleration
+                else:
+                    self.vel_x += self.acceleration
             self.facing_right = True
         elif keys[pygame.K_a] or keys[pygame.K_LEFT]:
             # acelerar hacia la izquierda
@@ -61,7 +67,11 @@ class Player:
                  # Si actualmente esta en el aire, que ya no aumente la aceleración en el eje x, si no que por fricción la reduzca
                 pass
             else:
-                self.vel_x -= self.acceleration
+                if self.vel_x > 0:
+                    self.vel_x = 0
+                    self.vel_x -= self.acceleration
+                else:
+                    self.vel_x -= self.acceleration
             self.facing_right = False
         else:
             # no presionás, que frene
