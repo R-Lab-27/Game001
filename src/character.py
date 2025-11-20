@@ -11,25 +11,20 @@ class Player:
         # Definir los rangos para idle, walk y run
         
         animation_ranges = {
-            "idle": (0, 4),
-            "agachar": (5, 8),
-            "run": (9, 16),
-            "jump": (17, 25),
-            "attack_1":(43, 48),
-            "attack_2": (49, 53),
-            "attack_3": (54, 59)
+            "idle": (0, 3),
+            "agachar": (4, 7),
+            "run": (8, 15),
+            "jump": (16, 23),
+            "attack_1":(40, 47),
+            "attack_2": (48, 52),
+            "attack_3": (53, 58)
         }
 
-        # self.frame_duration = {
-        #     "idle": 
-        # }
-        # if self.state == "attack":
-        #     self.frame_duration = 10
 
         self.anim = AnimatedSprite(self.sprite_sheet, animation_ranges=animation_ranges, frame_duration=7)
 
         self.rect = pygame.Rect(x, y,
-                                self.sprite_sheet.frame_width,
+                                self.sprite_sheet.frame_width * 0.7,
                                 self.sprite_sheet.frame_height)
         
         # Velocidad física
@@ -110,7 +105,7 @@ class Player:
                 self.is_in_air = True
 
         #Atacar
-        if keys[pygame.K_r] and not self.is_in_air:
+        if keys[pygame.K_r]:
             #Solo atacar si no estamos en el aire, en este caso activamos el buffer para rastrear el combo de ataque
             if self.combo_step > 0: #Si ya esta en un ataque
                 self.combo_buffer = True #permitir combo
@@ -136,12 +131,12 @@ class Player:
         #Si presionas R y el combo aún no inicio, inicia el combo
         elif self.combo_buffer and self.combo_step == 0:
             self.combo_buffer = False
-            self.combo_step += 1
+            self.combo_step = 1
             new_state = "attack_1"
         #Si ya estas en medio de un combo, continuar con la animación actual
-        elif self.combo_step > 0:
+        elif self.combo_buffer and self.combo_step > 0:
             new_state = f"attack_{self.combo_step}"
-            self.combo_step += 1
+            #self.combo_step += 1
         #Movimiento del personaje
         else:
             speed = abs(self.vel_x)
@@ -167,7 +162,7 @@ class Player:
         if self.combo_buffer:
             self.combo_buffer = False
             self.combo_step += 1
-            if self.combo_step >= 3:
+            if self.combo_step > 3:
                 self.combo_step = 0
             return
 
