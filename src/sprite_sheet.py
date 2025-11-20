@@ -1,27 +1,26 @@
 import pygame
 
 class SpriteSheet:
-    def __init__(self, image, frame_width, frame_height):
-        self.sheet = image
-        self.frame_width = frame_width
-        self.frame_height = frame_height
+    def __init__(self, filename, cols, rows):
+        self.sheet = pygame.image.load(filename).convert_alpha()
+        self.cols = cols
+        self.rows = rows
+        self.sheet_width = self.sheet.get_width()
+        self.sheet_height = self.sheet.get_height()
+        self.frame_width = self.sheet_width // cols
+        self.frame_height = self.sheet_height // rows
+        self.frames = []
+        self.load_frames()
 
-    def get_frame(self, col, row):
-        """Devuelve un subsurface para el frame en la columna col y fila row."""
-        rect = pygame.Rect(
-            col * self.frame_width,
-            row * self.frame_height,
-            self.frame_width,
-            self.frame_height
-        )
-        # sub superficie
-        image = pygame.Surface((self.frame_width, self.frame_height), pygame.SRCALPHA)
-        image.blit(self.sheet, (0, 0), rect)
-        return image
-
-    def get_animation_frames(self, row, num_frames):
-        """Devuelve una lista de frames de una misma fila (animación)."""
-        frames = []
-        for col in range(num_frames):
-            frames.append(self.get_frame(col, row))
-        return frames
+    def load_frames(self):
+        for row in range(self.rows):
+            for col in range(self.cols):
+                x = col * self.frame_width
+                y = row * self.frame_height
+                rect = pygame.Rect(x, y, self.frame_width, self.frame_height)
+                frame = self.sheet.subsurface(rect)
+                self.frames.append(frame)
+    
+    def get_frame(self, index):
+        return self.frames[index]
+             
