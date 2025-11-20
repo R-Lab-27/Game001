@@ -1,10 +1,10 @@
-import pygame, constants
+import pygame
 from animated_sprite import AnimatedSprite
 from sprite_sheet import SpriteSheet
 
 
 class Player:
-    def __init__(self, x, y):
+    def __init__(self, x, y, platforms):
         #Carga el mapa de animaciones del personaje
         self.sprite_sheet = SpriteSheet("/home/r/Training/Proyectos/Game001/src/assets/adventurer-1.3-Sheet.png", 8, 12)
         # Usar AnimatedSprite
@@ -15,7 +15,7 @@ class Player:
             "run": (9, 16),
             "jump": (17, 25)
         }
-        self.anim = AnimatedSprite(self.sprite_sheet, animation_ranges=animation_ranges, frame_duration=5)
+        self.anim = AnimatedSprite(self.sprite_sheet, animation_ranges=animation_ranges, frame_duration=7)
 
         self.rect = pygame.Rect(x, y,
                                 self.sprite_sheet.frame_width,
@@ -31,11 +31,11 @@ class Player:
 
         # Gravedad y salto
         self.gravity = 0.5
-        self.jump_strength = -10 #velocidad inicial cuando salta
+        self.jump_strength = -8 #velocidad inicial cuando salta
         self.falling_terminal_vel = 10
 
         # Plataformas (listas o groupo de objetos con los cuales podemos colicionar)
-        self.platforms = constants.platforms
+        self.platforms = platforms
 
         #nuestro vector de dirección
         self.facing_right = True # suposición inicial
@@ -49,10 +49,16 @@ class Player:
         keys = pygame.key.get_pressed()
         if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
             # acelerar hacia la derecha
+            if self.is_in_air:
+                # Si actualmente esta en el aire, que ya no aumente la aceleración en el eje x, si no que por fricción la reduzca
+                self.vel_x -= self.friction
             self.vel_x += self.acceleration
             self.facing_right = True
         elif keys[pygame.K_a] or keys[pygame.K_LEFT]:
             # acelerar hacia la izquierda
+            if self.is_in_air:
+                 # Si actualmente esta en el aire, que ya no aumente la aceleración en el eje x, si no que por fricción la reduzca
+                self.vel_x += self.friction
             self.vel_x -= self.acceleration
             self.facing_right = False
         else:
