@@ -15,10 +15,10 @@ clock = pygame.time.Clock()
 
 platforms = pygame.sprite.Group()
 #Limitando el movimiento al tamaño de la ventana
-platforms.add(Platform(0, 480, 680, 1)) #suelo
-platforms.add(Platform(0, 0, 480, 1)) #techo
-platforms.add(Platform(0, 0, 1, 480)) #lado izquierdo
-platforms.add(Platform(679, 0, 1, 480)) #lado derecho
+platforms.add(Platform(0, constants.WINDOW_HEIGHT, constants.WINDOW_WIDTH, 1)) #suelo
+platforms.add(Platform(0, 0, constants.WINDOW_HEIGHT, 1)) #techo
+platforms.add(Platform(0, 0, 1, constants.WINDOW_HEIGHT)) #lado izquierdo
+platforms.add(Platform(constants.WINDOW_WIDTH, 0, 1, constants.WINDOW_HEIGHT)) #lado derecho
 
 #Añadiendo algunas plataformas dentro de la ventana
 platforms.add(Platform(200, 440, 150, 20))
