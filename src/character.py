@@ -1,6 +1,7 @@
-import pygame
+import pygame, constants
 from animated_sprite import AnimatedSprite
 from sprite_sheet import SpriteSheet
+
 
 class Player:
     def __init__(self, x, y):
@@ -22,10 +23,19 @@ class Player:
         
         # Velocidad física
         self.vel_x = 0.0
+        self.vel_y = 0.0
         self.acceleration = 0.3   # cuánto acelera al apretar tecla
         self.max_walk_speed = 2.0
         self.max_run_speed = 5.0
         self.friction = 0.3       # desacelera cuando no se presiona
+
+        # Gravedad y salto
+        self.gravity = 0.5
+        self.jump_strength = -10 #velocidad inicial cuando salta
+        self.falling_terminal_vel = 10
+
+        # Plataformas (listas o groupo de objetos con los cuales podemos colicionar)
+        self.platforms = constants.platforms
 
         #nuestro vector de dirección
         self.facing_right = True # suposición inicial
@@ -33,6 +43,7 @@ class Player:
         # Estado de animación actual
         self.state = "idle"
         self.anim.play(self.state)
+        self.is_in_air = False
 
     def handle_input(self):
         keys = pygame.key.get_pressed()
@@ -55,28 +66,73 @@ class Player:
                 if self.vel_x > 0:
                     self.vel_x = 0
 
+        #Saltar
+        if keys[pygame.K_SPACE]:
+            #solo saltar si no esta ya en el aire
+            if not self.is_in_air:
+                self.vel_y = self.jump_strength
+                self.is_in_air = True
+
         # limitar la velocidad
         # si querés que "run" sea cuando vas rápido
         # podés hacer algo como:
         if abs(self.vel_x) > self.max_run_speed:
             self.vel_x = self.max_run_speed * (1 if self.vel_x > 0 else -1)
 
+    def apply_gravity(self):
+        # Aplicar la gravedad
+        self.vel_y += self.gravity
+        # Limitar la velocidad de caida
+        # Velocidad de caida terminal 10.0 (Si alcanza esa velocidad de caida, no se salva)
+        self.vel_y = min(self.vel_y, self.falling_terminal_vel)
+
     def update_state(self):
-        # decís cuál estado usar según la velocidad
-        speed = abs(self.vel_x)
-        if speed < 0.1:
-            new_state = "idle"
-        elif speed < self.max_walk_speed:
-            new_state = "run"
+        # Decidir animaciones según estado
+        if self.is_in_air:
+            new_state = "jump"
         else:
-            new_state = "run"
+            speed = abs(self.vel_x)
+            if speed < 0.1:
+                new_state = "idle"
+            elif speed < self.max_walk_speed:
+                new_state = "run"
+            else:
+                new_state = "run"
 
         if new_state != self.state:
             self.state = new_state
             self.anim.play(new_state)
 
+    def resolve_collisions(self):
+        """ Resolver colisiones verticales y horizontales con plataformas"""
+        # Primero mover en x y verificar coliciones horizontales
+        self.rect.x += self.vel_x
+        hits = [p for p in self.platforms if self.rect.colliderect(p.rect)]
+        for plat in hits:
+            if self.vel_x > 0: # Nos movemos hacia la derecha
+                self.rect.right = plat.rect.left
+            elif self.vel_x < 0: # Nos movemos hacia la izquierda
+                self.rect.left = plat.rect.right
+            self.vel_x = 0
+
+        # Ahora mover y verificar en el eje y
+        self.rect.y += self.vel_y
+        hits = [p for p in self.platforms if self.rect.colliderect(p.rect)]
+        # Si coliciona verticalmente, ajustar y frenar la caida o salto
+        for plat in hits:
+            if self.vel_y > 0: #Estamos cayendo
+                self.rect.bottom = plat.rect.top
+                self.vel_y = 0
+                self.is_in_air = False
+            elif self.vel_y < 0: #Subiendo (saltando y choca con el techo)
+                self.rect.top = plat.rect.bottom
+                self.vel_y = 0
+
+
     def update(self):
         self.handle_input()
+        self.apply_gravity()
+        self.resolve_collisions()
         self.update_state()
 
         # actualizás animación
@@ -90,4 +146,4 @@ class Player:
         #voltear la imagen si va en dirección izquierda
         if not self.facing_right:
             frame = pygame.transform.flip(frame, True, False)
-        screen.blit(frame, self.rect.topleft)
+        screen.blit(frame, (self.rect.x, self.rect.y))
