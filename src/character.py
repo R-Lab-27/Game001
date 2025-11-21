@@ -21,8 +21,9 @@ class Player:
         }
 
 
-        self.anim = AnimatedSprite(self.sprite_sheet, animation_ranges=animation_ranges, frame_duration=7)
+        self.anim = AnimatedSprite(self.sprite_sheet, animation_ranges=animation_ranges, frame_duration=4)
 
+        # Rectangulo de colisión del personaje
         self.rect = pygame.Rect(x, y,
                                 self.sprite_sheet.frame_width * 0.7,
                                 self.sprite_sheet.frame_height)
@@ -39,6 +40,7 @@ class Player:
         self.gravity = 0.5
         self.jump_strength = -8 #velocidad inicial cuando salta
         self.falling_terminal_vel = 10
+        self.jump_release = True
 
         # Plataformas (listas o groupo de objetos con los cuales podemos colicionar)
         self.platforms = platforms
@@ -100,9 +102,13 @@ class Player:
         #Saltar
         if keys[pygame.K_SPACE]:
             #solo saltar si no esta ya en el aire
-            if not self.is_in_air:
+            if self.jump_release and not self.is_in_air:
                 self.vel_y = self.jump_strength
                 self.is_in_air = True
+                self.jump_release = False
+        else:
+            #La dejo de presionar la tecla
+            self.jump_release = True
 
         #Atacar
         if keys[pygame.K_r]:
