@@ -1,5 +1,5 @@
 from item import Item
-import constants
+import item_constants
 
 class Inventory:
     def __init__(self, max_slots=9):
@@ -9,7 +9,7 @@ class Inventory:
     def add_item(self, item_name, quantity=1):
         #Agregar items teniendo en cuenta los límites de stack y slots disponibles
 
-        if item_name not in constants.ALLOWED_ITEMS:
+        if item_name not in item_constants.ALLOWED_ITEMS:
             print(f"Error: {item_name} no está en la lista de objetos permitidos.")
             return False
         # 1 Intentar agregar a un stack de objeto existente
@@ -26,7 +26,7 @@ class Inventory:
         # 2 Si sobran unidades, intentar crear nuevos stacks
         for i in range(self.max_slots):
             if self.slots[i] is None:
-                agregar = min(constants.ALLOWED_ITEMS[item_name]["max_stack"], quantity)
+                agregar = min(item_constants.ALLOWED_ITEMS[item_name]["max_stack"], quantity)
                 self.slots[i] = Item(item_name, agregar)
                 quantity -= agregar
 

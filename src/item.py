@@ -1,10 +1,12 @@
 import pygame
-from constants import ALLOWED_ITEMS, ITEM_SPRITESHEET
+import item_constants
+from sprite_sheet import SpriteSheet
 
 class Item:
     def __init__(self, name, quantity=1):
 
-        data = ALLOWED_ITEMS[name]
+        data = item_constants.ALLOWED_ITEMS[name]
+        
 
         self.name = name
         self.description = data["description"]
@@ -15,7 +17,8 @@ class Item:
         index = data["index"]
 
         # Obtener el frame desde el spritesheet de items
-        self.icon = ITEM_SPRITESHEET.get_frame(index)
+        self.icon = item_constants.ITEM_SPRITESHEET.get_frame(index)
+        print(f"icon: {index} -> x: {self.icon.get_width()} y: {self.icon.get_height()}")
 
         # Escalar icono
         self.icon = pygame.transform.scale(self.icon, (32, 32)) # tamaño estandar

@@ -135,6 +135,13 @@ class Player:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_f:
                 self.inventory.add_item("apple", 1)
+            if event.key == pygame.K_g:
+                self.inventory.add_item("banana", 1)
+            if event.key == pygame.K_c:
+                self.inventory.add_item("potion", 1)
+            if event.key == pygame.K_v:
+                self.inventory.add_item("key", 1)
+
 
     def apply_gravity(self):
         # Aplicar la gravedad

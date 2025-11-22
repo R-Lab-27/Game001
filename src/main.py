@@ -1,9 +1,10 @@
-import pygame, sys, constants
-from constants import WINDOW_HEIGHT, WINDOW_WIDTH, FPS, PATH_ITEMS
-from inventoryui import InventoryUI
+import pygame, sys, item_constants
+from constants import WINDOW_HEIGHT, WINDOW_WIDTH, FPS
+from inventory_ui import InventoryUI
 from character import Player
 from plataformas import Platform
 from sprite_sheet import SpriteSheet
+
 
 pygame.init()
 
@@ -12,8 +13,9 @@ pygame.display.set_caption("Mi Primer Juego")
 #Create the window for the game
 screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 
+item_constants.ITEM_SPRITESHEET = SpriteSheet(item_constants.PATH_ITEMS, item_constants.SPRITE_COLS, item_constants.SPRITE_ROWS)
 clock = pygame.time.Clock()
-constants.ITEM_SPRITESHEET = SpriteSheet(PATH_ITEMS, 16, 16)
+
 
 platforms = pygame.sprite.Group()
 #Limitando el movimiento al tamaño de la ventana

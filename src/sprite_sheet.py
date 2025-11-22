@@ -2,7 +2,7 @@ import pygame
 
 class SpriteSheet:
     def __init__(self, filename, anim_cols, anim_rows):
-        self.sheet = pygame.image.load(filename).convert_alpha() #if pygame.display.get_surface() else pygame.image.load(filename)
+        self.sheet = pygame.image.load(filename).convert_alpha() #
         self.cols = anim_cols
         self.rows = anim_rows
         self.sheet_width = self.sheet.get_width()
