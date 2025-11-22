@@ -19,17 +19,20 @@ clock = pygame.time.Clock()
 
 platforms = pygame.sprite.Group()
 #Limitando el movimiento al tamaño de la ventana
-platforms.add(Platform(0, WINDOW_HEIGHT, WINDOW_WIDTH, 1)) #suelo
+platforms.add(Platform(0, WINDOW_HEIGHT - 40, WINDOW_WIDTH, 1)) #suelo
 platforms.add(Platform(0, 0, WINDOW_HEIGHT, 1)) #techo
 platforms.add(Platform(0, 0, 1, WINDOW_HEIGHT)) #lado izquierdo
 platforms.add(Platform(WINDOW_WIDTH, 0, 1, WINDOW_HEIGHT)) #lado derecho
 
 #Añadiendo algunas plataformas dentro de la ventana
-platforms.add(Platform(200, 440, 150, 20))
-platforms.add(Platform(500, 390, 180, 20))
+platforms.add(Platform(200, 400, 150, 20))
+platforms.add(Platform(500, 360, 180, 20))
 
 heroe = Player(50, 50, platforms)
 inventory_ui = InventoryUI(heroe.inventory)
+bg = pygame.image.load("src/assets/icons/Background.png").convert_alpha()
+bg = pygame.transform.scale(bg, (640, 480))
+
 
 #The Game Loop
 while True:
@@ -47,6 +50,7 @@ while True:
     heroe.update()
 
     screen.fill((200,200,200))
+    screen.blit(bg, (0, 0))
     platforms.draw(screen)
     heroe.draw(screen)
     inventory_ui.draw(screen)
