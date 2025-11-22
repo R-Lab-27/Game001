@@ -21,19 +21,25 @@ class Player:
         }
 
 
-        self.anim = AnimatedSprite(self.sprite_sheet, animation_ranges=animation_ranges, frame_duration=4)
+        self.anim = AnimatedSprite(self.sprite_sheet, animation_ranges=animation_ranges, frame_duration=6)
 
+        self.hitbox_width = int(self.sprite_sheet.frame_width * 0.55)
+        self.hitbox_height = int(self.sprite_sheet.frame_height * 0.85)
+        self.offset_x = (self.sprite_sheet.frame_width - self.hitbox_width) // 2
+        self.offset_y = self.sprite_sheet.frame_height - self.hitbox_height
         # Rectangulo de colisión del personaje
-        self.rect = pygame.Rect(x, y,
-                                self.sprite_sheet.frame_width * 0.7,
-                                self.sprite_sheet.frame_height)
+        self.rect = pygame.Rect(
+                                x + self.offset_x,
+                                y + self.offset_y,
+                                self.hitbox_width,
+                                self.hitbox_height)
         
         # Velocidad física
         self.vel_x = 0.0
         self.vel_y = 0.0
         self.acceleration = 0.1   # cuánto acelera al apretar tecla
-        self.max_walk_speed = 2.0
-        self.max_run_speed = 3.0
+        self.max_walk_speed = 1.0
+        self.max_run_speed = 2.5
         self.friction = 0.3       # desacelera cuando no se presiona
 
         # Gravedad y salto
@@ -133,7 +139,6 @@ class Player:
         # Decidir animaciones según estado
         if self.is_in_air:
             new_state = "jump"
-
         #Si presionas R y el combo aún no inicio, inicia el combo
         elif self.combo_buffer and self.combo_step == 0:
             self.combo_buffer = False
@@ -158,7 +163,6 @@ class Player:
             self.state = new_state
 
             if "attack" in new_state:
-            # if new_state.startswith("attack"):
                 self.anim.play(new_state, lock=True, on_end=lambda: self._finish_attack())
             else:
                 self.anim.play(new_state)
@@ -185,9 +189,10 @@ class Player:
         for plat in hits:
             if self.vel_x > 0: # Nos movemos hacia la derecha
                 self.rect.right = plat.rect.left
+                self.vel_x = 0
             elif self.vel_x < 0: # Nos movemos hacia la izquierda
                 self.rect.left = plat.rect.right
-            self.vel_x = 0
+                self.vel_x = 0
 
         # Ahora mover y verificar en el eje y
         self.rect.y += self.vel_y
@@ -220,4 +225,10 @@ class Player:
         #voltear la imagen si va en dirección izquierda
         if not self.facing_right:
             frame = pygame.transform.flip(frame, True, False)
-        screen.blit(frame, (self.rect.x, self.rect.y))
+
+        #Offset para dibujar el sprite encima del hitbox y corregir el posicionamiento
+        #self.rect.x - self.offset_x y self.rect.y - self.offset_y
+        screen.blit(frame, (self.rect.x + (-self.offset_x), self.rect.y + (-self.offset_y)))
+
+        pygame.draw.rect(screen, (255, 0, 0), self.rect, 2)
+
