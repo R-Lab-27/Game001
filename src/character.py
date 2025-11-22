@@ -1,6 +1,7 @@
 import pygame
 from animated_sprite import AnimatedSprite
 from sprite_sheet import SpriteSheet
+from inventory import Inventory
 
 
 class Player:
@@ -8,8 +9,7 @@ class Player:
         #Carga el mapa de animaciones del personaje
         self.sprite_sheet = SpriteSheet("/home/r/Training/Proyectos/Game001/src/assets/adventurer-1.3-Sheet.png", 8, 12)
         # Usar AnimatedSprite
-        # Definir los rangos para idle, walk y run
-        
+        # Definir los rangos para idle, walk y run 
         animation_ranges = {
             "idle": (0, 3),
             "agachar": (4, 7),
@@ -33,6 +33,9 @@ class Player:
                                 y + self.offset_y,
                                 self.hitbox_width,
                                 self.hitbox_height)
+        
+        # Añadir Inventario
+        self.inventory = Inventory()
         
         # Velocidad física
         self.vel_x = 0.0
@@ -128,6 +131,11 @@ class Player:
         if abs(self.vel_x) > self.max_run_speed:
             self.vel_x = self.max_run_speed * (1 if self.vel_x > 0 else -1)
 
+    def handle_event(self, event):
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_f:
+                self.inventory.add_item("apple", 1)
+
     def apply_gravity(self):
         # Aplicar la gravedad
         self.vel_y += self.gravity
@@ -219,6 +227,15 @@ class Player:
 
         # actualiza posición según velocidad
         self.rect.x += self.vel_x
+
+    def draw_inventory(self, screen):
+        font = pygame.font.SysFont(None, 18)
+        x , y = 10, 10
+
+        for item in self.inventory.items.values():
+            text = font.render(f"{item.name}: {item.quantity}", True, (0,0,0))
+            screen.blit(text, (x,y))
+            y += 25
 
     def draw(self, screen):
         frame = self.anim.get_current_frame()
