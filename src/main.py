@@ -36,6 +36,7 @@ bg = pygame.transform.scale(bg, (640, 480))
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 PATH_ITEMS = os.path.join(BASE_DIR, "assets", "icons", "apple.png")
 apple = pygame.image.load(PATH_ITEMS).convert_alpha()
+apple = pygame.transform.scale(apple, (32,32))
 
 
 #The Game Loop
@@ -56,6 +57,7 @@ while True:
     screen.fill((200,200,200))
     screen.blit(bg, (0, 0))
     screen.blit(apple, (10, 10))
+
     #Draw platforms for debug
     platforms.draw(screen)
     heroe.draw(screen)

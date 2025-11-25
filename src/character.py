@@ -9,7 +9,7 @@ class Player:
         #Carga el mapa de animaciones del personaje
         self.sprite_sheet = SpriteSheet("/home/r/Training/Proyectos/Game001/src/assets/adventurer-1.3-Sheet.png", 8, 12)
         # Usar AnimatedSprite
-        # Definir los rangos para idle, walk y run 
+        # Definir los rangos para idle, walk y run
         animation_ranges = {
             "idle": (0, 3),
             "agachar": (4, 7),
@@ -249,6 +249,7 @@ class Player:
         #voltear la imagen si va en dirección izquierda
         if not self.facing_right:
             frame = pygame.transform.flip(frame, True, False)
+
 
         #Offset para dibujar el sprite encima del hitbox y corregir el posicionamiento
         #self.rect.x - self.offset_x y self.rect.y - self.offset_y
