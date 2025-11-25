@@ -1,4 +1,4 @@
-import pygame, sys, item_constants
+import pygame, sys, item_constants, os
 from constants import WINDOW_HEIGHT, WINDOW_WIDTH, FPS
 from inventory_ui import InventoryUI
 from character import Player
@@ -20,9 +20,9 @@ clock = pygame.time.Clock()
 platforms = pygame.sprite.Group()
 #Limitando el movimiento al tamaño de la ventana
 platforms.add(Platform(0, WINDOW_HEIGHT - 40, WINDOW_WIDTH, 1)) #suelo
-platforms.add(Platform(0, 0, WINDOW_HEIGHT, 1)) #techo
+platforms.add(Platform(0, 0, WINDOW_WIDTH, 1)) #techo
 platforms.add(Platform(0, 0, 1, WINDOW_HEIGHT)) #lado izquierdo
-platforms.add(Platform(WINDOW_WIDTH, 0, 1, WINDOW_HEIGHT)) #lado derecho
+platforms.add(Platform(WINDOW_WIDTH - 1, 0, 1, WINDOW_HEIGHT)) #lado derecho
 
 #Añadiendo algunas plataformas dentro de la ventana
 platforms.add(Platform(200, 400, 150, 20))
@@ -32,6 +32,10 @@ heroe = Player(50, 50, platforms)
 inventory_ui = InventoryUI(heroe.inventory)
 bg = pygame.image.load("src/assets/icons/Background.png").convert_alpha()
 bg = pygame.transform.scale(bg, (640, 480))
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+PATH_ITEMS = os.path.join(BASE_DIR, "assets", "icons", "apple.png")
+apple = pygame.image.load(PATH_ITEMS).convert_alpha()
 
 
 #The Game Loop
@@ -51,6 +55,8 @@ while True:
 
     screen.fill((200,200,200))
     screen.blit(bg, (0, 0))
+    screen.blit(apple, (10, 10))
+    #Draw platforms for debug
     platforms.draw(screen)
     heroe.draw(screen)
     inventory_ui.draw(screen)

@@ -55,7 +55,7 @@ class InventoryUI:
                     #Muestra el icono en el slot
                     offset_x = 1
                     offset_y = 1
-                    screen.blit(item.icon, (x, y))
+                    screen.blit(item.icon, (x + offset_x, y + offset_y))
 
                     #muestra el la cantidad del objeto sobre la imagen del icono
                     qty = font.render(str(item.quantity), True, (0,0,0))

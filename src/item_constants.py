@@ -1,11 +1,11 @@
 import os
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-PATH_ITEMS = os.path.join(BASE_DIR, "assets", "icons", "objects_icons_mod.png")
+PATH_ITEMS = os.path.join(BASE_DIR, "assets", "icons", "objects_icons.png")
 
 ITEM_SPRITESHEET = None
-SPRITE_COLS = 8
-SPRITE_ROWS = 12
+SPRITE_COLS = 10
+SPRITE_ROWS = 10
 
 ALLOWED_ITEMS = {
     "apple": {
