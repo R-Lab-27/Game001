@@ -23,4 +23,3 @@ class SpriteSheet:
     
     def get_frame(self, index):
         return self.frames[index]
-             
